@@ -1,0 +1,7 @@
+# gitignore for nodejs files
+# dependencies
+node_modules
+
+#gitignore for expo files
+# expo
+.expo
