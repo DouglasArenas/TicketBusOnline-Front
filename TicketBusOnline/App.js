@@ -9,7 +9,7 @@ import FindTrips from './src/components/Find_trips';
 
 
 export default function App() {
-  return <Profile/>;
+  return <Mainpage/>;
 }
 
 
