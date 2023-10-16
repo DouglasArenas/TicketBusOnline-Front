@@ -1,34 +1,25 @@
-import React from 'react';
+import React, {   useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { Instance } from '../utils/api';
+import axios from 'axios';
+import { baseURL } from '../utils/api';
+
 
 const MyTrips = ({ navigation }) => {
 
-  const tripsData = [
-    {
-      origen: '',
-      destino: '',
-      asiento: '',
-      duracion: '',
-      fechaLlegada: '',
-    },
-    {
-      origen: '',
-      destino: '',
-      asiento: '',
-      duracion: '',
-      fechaLlegada: '',
-    },
-    {
-      origen: '',
-      destino: '',
-      asiento: '',
-      duracion: '',
-      fechaLlegada: '',
-    },
+  const [tripsData, setTripsData] = useState([]);
 
-
-    
-  ];
+  useEffect(() => {
+    axios.get(baseURL + '/trip/all')
+    // Instance.get('trip/all')
+    .then((response) => {
+      setTripsData(response.data);
+    })
+    .catch((error) => {
+      console.log('Error getting data from API',error);
+      console.log("Error details", error.message, error.response);
+    });
+  }, []);
 
   return (
     <ScrollView style={styles.container}>

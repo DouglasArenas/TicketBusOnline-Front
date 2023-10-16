@@ -1,16 +1,9 @@
+// App.js
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import Mainpage from './src/components/Mainpage';
-import Profile from './src/components/Profile';
-import Login  from './src/components/Login';
-import Register from './src/components/Register';
-import MyTrips from './src/components/My_trips';
-import FindTrips from './src/components/Find_trips';
+import AppNavigator from './src/navigation/AppNavigator'; // Asegúrate de importar tu AppNavigator aquí
 
+const App = () => {
+  return <AppNavigator />;
+};
 
-export default function App() {
-  return <Mainpage/>;
-}
-
-
-
+export default App;
