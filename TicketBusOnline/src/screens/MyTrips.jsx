@@ -1,5 +1,5 @@
 import React, {   useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, FlatList, CardContent, CardAction, CardButton, Card } from 'react-native';
 import { Instance } from '../utils/api';
 import axios from 'axios';
 import { baseURL } from '../utils/api';
@@ -7,13 +7,14 @@ import { baseURL } from '../utils/api';
 
 const MyTrips = ({ navigation }) => {
 
-  const [tripsData, setTripsData] = useState([]);
+  const [tripsData, setTripsData] = useState(['']);
 
   useEffect(() => {
-    axios.get(baseURL + '/trip/all')
+    axios.get(baseURL + 'trip/all')
     // Instance.get('trip/all')
     .then((response) => {
       setTripsData(response.data);
+      console.log('Getting data from API', response.data);
     })
     .catch((error) => {
       console.log('Error getting data from API',error);
@@ -23,41 +24,21 @@ const MyTrips = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Mis Viajes</Text>
-      {tripsData.map((trip, index) => (
-        <View key={index} style={styles.tripContainer}>
-          <View style={styles.tripInfo}>
-            <Text style={styles.tripLabel}>Origen:</Text>
-            <Text style={styles.tripValue}>{trip.origen}</Text>
-          </View>
-          <View style={styles.tripInfo}>
-            <Text style={styles.tripLabel}>Destino:</Text>
-            <Text style={styles.tripValue}>{trip.destino}</Text>
-          </View>
-          <View style={styles.tripInfo}>
-            <Text style={styles.tripLabel}>NºAsiento:</Text>
-            <Text style={styles.tripValue}>{trip.asiento}</Text>
-          </View>
-          <View style={styles.tripInfo}>
-            <Text style={styles.tripLabel}>Duración:</Text>
-            <Text style={styles.tripValue}>{trip.duracion}</Text>
-          </View>
-          <View style={styles.tripInfo}>
-            <Text style={styles.tripLabel}>Fecha Origen:</Text>
-            <Text style={styles.tripValue}>{trip.fechaLlegada}</Text>
-          </View>
-          <View style={styles.tripInfo}>
-            <Text style={styles.tripLabel}>Fecha Llegada:</Text>
-            <Text style={styles.tripValue}>{trip.fechaLlegada}</Text>
-          </View>
+    <View>
+      {tripsData.map(item => (
+        <View style={styles.tripContainer} key={item.id}>
+          {item.bus && <Text>Capacity: {item.bus.capacity}</Text>}
+          {item.bus && item.bus.company && <Text>Address: {item.bus.company.address}</Text>}
+          {item.bus && item.bus.company && <Text>Phone: {item.bus.company.phone}</Text>}
+          {item.destination && <Text>Destination: {item.destination.name}</Text>}
+          {item.origin && <Text>Origin: {item.origin.name}</Text>}
+          {item.departureDateTime && <Text>Departure: {item.departureDateTime}</Text>}
+          {item.bus && item.bus.company && <Text>Nombre: {item.bus.company.name}</Text>}
         </View>
       ))}
-      <TouchableOpacity onPress={() => navigation.navigate('MainPage')} style={styles.homeButton}>
-        <Text style={styles.homeButtonText}>Home</Text>
-      </TouchableOpacity>
+    </View>
     </ScrollView>
-  );
-};
+  )};
 
 const windowWidth = Dimensions.get('window').width;
 
