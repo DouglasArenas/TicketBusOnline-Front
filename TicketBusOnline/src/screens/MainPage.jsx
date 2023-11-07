@@ -1,9 +1,47 @@
-import React from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import CustomTextInput from '../components/textInput/TextInput';
+import Button from '../components/button/Button';
+import axios from 'axios';
+import { baseURL } from '../utils/api';
+import { Picker } from '@react-native-picker/picker';
+import Autocomplete from 'react-native-autocomplete-input';
 
 const MainPage = () => {
   const nav = useNavigation();
+  const [query, setQuery] = useState('');
+  const [cities, setCities] = useState([]);
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
+  const [departureDate, setDepartureDate] = useState('');
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await axios.get(`${baseURL}city/all`);
+        setCities(response.data);
+      }
+      catch (e) {
+        console.log("Error fetching cities",e);
+      }
+    }
+    fetchCities();
+  }, []);
+
+
+  const validateAndNavigate = () => {
+    if (query === '' || destination === '' || departureDate === '') {
+      alert('Please fill all the fields');
+    }else {
+      nav.navigate('FindTrips', {origin: query, destination: destination, departureDate: departureDate});
+    }
+  }
+
+  const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
+
+  const filteredCities = cities.filter(city => city.name.toLowerCase().includes(query.toLowerCase()));
+
   return (
     <View style={styles.container}>
 
@@ -14,24 +52,51 @@ const MainPage = () => {
         <Button title="Notif." onPress={ () => nav.navigate('MainPage')}/>
       </View>
 
-      <View style={styles.buttonsContainer}>
-        <View style={styles.buttonWrapper}>
-          <Button title="Origen" color="black" />
-        </View>
-        <View style={styles.buttonWrapper}>
-          <Button title="Destino" color="black" />
-        </View>
-        <View style={styles.buttonWrapper}>
-          <Button title="Fecha de Partida" color="black" />
-        </View>
+        <View style={styles.inputsContainer}>
+          <View style={styles.inputWrapper}>
+            <Autocomplete
+              style={{zIndex: 1}}
+              autoCapitalize="none"
+              autoCorrect={false}
+              data={filteredCities.length === 1 && comp(query, filteredCities[0].name) ? [] : filteredCities}
+              defaultValue={query}
+              onChangeText={text => setQuery(text)}
+              placeholder="Origin"
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => setQuery(item.name)}>
+                  <Text>{item.name}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+          <View style={styles.inputWrapper}>
+            <Picker
+              style={{zIndex: 0}}
+              selectedValue={destination}
+              onValueChange={(itemValue) => setDestination(itemValue)}
+            >
+              {cities.map((city) => (
+                <Picker.Item key={city.id} label={city.name} value={city.name} />
+              ))}
+            </Picker>
+          </View>
+          <View style={styles.inputWrapper}>
+            <CustomTextInput
+              value={departureDate}
+              setValue={setDepartureDate}
+              placeholder="Departure Date"
+            />
+          </View>
       </View>
 
-      <View style={styles.searchButtonContainer}>
-        <Button title="Buscar" color="darkgreen" />
+      <View style={styles.buttonsContainer}>
+        <View style={styles.buttonWrapper}>
+          <Button title="Search" onPress={ () => nav.navigate('FindTrips', {origin: origin, destination: destination, departureDate: departureDate})}/>
+        </View>
       </View>
-    </View>
-  );
-};
+  </View>
+)};
+
 
 const styles = StyleSheet.create({
   container: {
@@ -46,17 +111,24 @@ const styles = StyleSheet.create({
     marginTop: 20, 
   },
   buttonsContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20, 
+    marginTop: 20,
+    paddingHorizontal: 10, 
   },
   buttonWrapper: {
     marginBottom: 10,
     width: 200,
   },
+  inputsContainer: {
+    padding: 10,
+    justifyContent: 'center',
+  },
   searchButtonContainer: {
     marginTop: 20,
+  },
+  inputWrapper: {
+    marginBottom: 60,
   },
 });
 

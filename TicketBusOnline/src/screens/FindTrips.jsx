@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, TextInput, Button } from 'react-native';
 
-const FindTrips = ({ navigation }) => {
+const FindTrips = ({ route }) => {
+
+  const { origin, destination, departureDate } = route.params;
   const [precioBusqueda, setPrecioBusqueda] = useState(''); 
 
   const tripsData = [
