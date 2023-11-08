@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Modal, FlatList, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import CustomTextInput from '../components/textInput/TextInput';
 import Button from '../components/button/Button';
 import axios from 'axios';
 import { baseURL } from '../utils/api';
 import { Picker } from '@react-native-picker/picker';
-import Autocomplete from 'react-native-autocomplete-input';
+import DatePicker from 'react-native-datepicker';
 
 const MainPage = () => {
   const nav = useNavigation();
-  const [query, setQuery] = useState('');
   const [cities, setCities] = useState([]);
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
-  const [departureDate, setDepartureDate] = useState('');
+  const [origin, setOrigin] = useState('Origin');
+  const [destination, setDestination] = useState('Destination');
+  const [date, setDate] = useState('');
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -29,74 +27,86 @@ const MainPage = () => {
     fetchCities();
   }, []);
 
-
-  const validateAndNavigate = () => {
-    if (query === '' || destination === '' || departureDate === '') {
-      alert('Please fill all the fields');
-    }else {
-      nav.navigate('FindTrips', {origin: query, destination: destination, departureDate: departureDate});
+  const handleSelectItem = (item, index) => {
+    if (index === 0) {
+      setOrigin(item.name);
+    } else {
+      setDestination(item.name);
     }
-  }
+  };
 
-  const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
-
-  const filteredCities = cities.filter(city => city.name.toLowerCase().includes(query.toLowerCase()));
+  const onChange = (event, selectedDate) => { 
+    const currentDate = selectedDate || date;
+    setDate(currentDate);
+  };
 
   return (
     <View style={styles.container}>
 
       <View style={styles.navBar}>
-        <Button title="Home" onPress={ () => nav.navigate('MainPage')}/>
-        <Button title="Trips" onPress={ () => nav.navigate('MyTrips')}/>
-        <Button title="Profile" onPress={ () => nav.navigate('Profile')}/>
-        <Button title="Notif." onPress={ () => nav.navigate('MainPage')}/>
+        <Button title="Home" children={"Home"} onPress={ () => nav.navigate('MainPage')}/>
+        <Button title="Trips" children={"Trips"} onPress={ () => nav.navigate('MyTrips')}/>
       </View>
 
-        <View style={styles.inputsContainer}>
-          <View style={styles.inputWrapper}>
-            <Autocomplete
-              style={{zIndex: 1}}
-              autoCapitalize="none"
-              autoCorrect={false}
-              data={filteredCities.length === 1 && comp(query, filteredCities[0].name) ? [] : filteredCities}
-              defaultValue={query}
-              onChangeText={text => setQuery(text)}
-              placeholder="Origin"
-              renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => setQuery(item.name)}>
-                  <Text>{item.name}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-          <View style={styles.inputWrapper}>
+      <View style={styles.inputsContainer}>
+        <View style={styles.inputWrapper}>
+          <View style={styles.input}>
+            <View style={styles.label}>
+              <Text>Origin</Text>
+            </View>
             <Picker
-              style={{zIndex: 0}}
-              selectedValue={destination}
-              onValueChange={(itemValue) => setDestination(itemValue)}
+              style={styles.picker}
+              selectedValue={origin}
+              onValueChange={(itemValue, itemIndex) => setOrigin(itemValue)}
             >
-              {cities.map((city) => (
-                <Picker.Item key={city.id} label={city.name} value={city.name} />
+              {cities.map((city, index) => (
+                <Picker.Item key={index} label={city.name} value={city.name} />
               ))}
             </Picker>
           </View>
-          <View style={styles.inputWrapper}>
-            <CustomTextInput
-              value={departureDate}
-              setValue={setDepartureDate}
-              placeholder="Departure Date"
-            />
+          <View style={styles.input}>
+            <View style={styles.label}>
+              <Text>Destination</Text>
+            </View>
+              <Picker
+                selectedValue={destination}
+                onValueChange={(itemValue, itemIndex) => setDestination(itemValue)}
+                style={styles.picker}
+              >
+                {cities.map((city, index) => (
+                  <Picker.Item key={index} label={city.name} value={city.name} />
+                ))}
+              </Picker>
           </View>
+          <View style={styles.input}>
+      <View style={styles.label}>
+        <Text>Date</Text>
       </View>
 
-      <View style={styles.buttonsContainer}>
-        <View style={styles.buttonWrapper}>
-          <Button title="Search" onPress={ () => nav.navigate('FindTrips', {origin: origin, destination: destination, departureDate: departureDate})}/>
+      <input 
+    type="date" 
+    style={styles.picker} 
+    value={date} 
+    min="2023-01-01" 
+    max="2024-12-31" 
+    onChange={(event) => {setDate(event.target.value)}}
+/>
+
+      </View>
+          </View>
+        <View style={styles.buttonsContainer}>
+          <View style={styles.buttonWrapper}>
+            <Button
+              title="Search"
+              children={"Search"}
+              onPress={ () => nav.navigate('FindTrips', {origin: origin, destination: destination, date: date})}/>
+          </View>
         </View>
       </View>
-  </View>
-)};
 
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -106,29 +116,49 @@ const styles = StyleSheet.create({
   },
   navBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20, 
-    marginTop: 20, 
+    justifyContent: 'space-around',
+    marginBottom: 20,
+    marginTop: 20,
+    paddingVertical: 10,
+    backgroundColor: 'green',
+    borderRadius: 8,
   },
   buttonsContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
-    paddingHorizontal: 10, 
+    paddingHorizontal: 10,
   },
   buttonWrapper: {
     marginBottom: 10,
     width: 200,
   },
   inputsContainer: {
+    flex: 1,
     padding: 10,
+    alignItems: 'center',
     justifyContent: 'center',
+
   },
   searchButtonContainer: {
     marginTop: 20,
   },
   inputWrapper: {
-    marginBottom: 60,
+    width: "100%",
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  input: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  picker: {
+    height: 40,
+    width: '100%',
+    paddingHorizontal: 10,
   },
 });
 

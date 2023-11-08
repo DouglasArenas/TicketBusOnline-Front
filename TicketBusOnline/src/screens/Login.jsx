@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
 
 const Login = () => {
   const [usuario, setUsuario] = useState('');
@@ -33,19 +33,19 @@ const Login = () => {
         value={contrasena}
       />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
+        <Pressable
           style={[styles.button, { backgroundColor: 'darkgreen' }]}
           onPress={handleIngresar}
         >
           <Text style={styles.buttonText}>Ingresar</Text>
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.buttonSpacing} />
-        <TouchableOpacity
+        <Pressable
           style={[styles.button, { backgroundColor: 'darkgreen' }]}
           onPress={handleCancelar}
         >
           <Text style={styles.buttonText}>Cancelar</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

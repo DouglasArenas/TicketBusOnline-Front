@@ -4,7 +4,7 @@ import { TextInput, StyleSheet } from "react-native";
 const CustomTextInput = ({ value, setValue, placeholder }) => {
     return(
         <TextInput
-            style={styles.input}
+            style={styles.input} 
             onChangeText={setValue}
             value={value}
             placeholder={placeholder}

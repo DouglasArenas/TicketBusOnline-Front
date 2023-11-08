@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
 
 const Register = () => {
   const [nombre, setNombre] = useState('');
@@ -37,18 +37,18 @@ const Register = () => {
         value={contrasena}
       />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
+        <Pressable
           style={[styles.button, { backgroundColor: 'darkgreen' }]}
           onPress={handleRegistrarse}
         >
           <Text style={styles.buttonText}>Registrarse</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </Pressable>
+        <Pressable
           style={[styles.button, { backgroundColor: 'darkgreen' }]}
           onPress={handleCancelar}
         >
           <Text style={styles.buttonText}>Cancelar</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
